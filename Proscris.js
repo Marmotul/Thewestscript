@@ -201,17 +201,16 @@
         var index = 0;
         var currentLength = 0;
         var maxLength = 299;
-        function delayedAjax(url, params, successCallback, delay) {
-    setTimeout(function() {
-        Ajax.get(url, params, successCallback);
-    }, delay);
-}
 
-delayedAjax('map', 'get_minimap', {}, function(r) {
-    var tiles = [];
-    var jobs = [];
-    // existing code...
-}, 1000); // Add a delay of 1000ms (1 second) between requests
+        function delayedAjax(url, params, successCallback, delay) {
+            setTimeout(function() {
+                Ajax.get(url, params, successCallback);
+            }, delay);
+        }
+
+        delayedAjax('map', 'get_minimap', {}, function(r) {
+            var tiles = [];
+            var jobs = [];
 
             for(var townNumber in r.towns) {
                 if(r.towns[townNumber].town_id == Character.homeTown.town_id) {
@@ -269,7 +268,7 @@ delayedAjax('map', 'get_minimap', {}, function(r) {
                     }
                 });
             }
-        });
+        }, 1000); // Add a delay of 1000ms (1 second) between requests
     } else {
         Proscris.findAllConsumables();
         Proscris.createWindow();
