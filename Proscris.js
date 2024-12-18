@@ -201,9 +201,17 @@
         var index = 0;
         var currentLength = 0;
         var maxLength = 299;
-        Ajax.get('map','get_minimap',{},function(r){
-            var tiles = [];
-            var jobs = [];
+        function delayedAjax(url, params, successCallback, delay) {
+    setTimeout(function() {
+        Ajax.get(url, params, successCallback);
+    }, delay);
+}
+
+delayedAjax('map', 'get_minimap', {}, function(r) {
+    var tiles = [];
+    var jobs = [];
+    // existing code...
+}, 1000); // Add a delay of 1000ms (1 second) between requests
 
             for(var townNumber in r.towns) {
                 if(r.towns[townNumber].town_id == Character.homeTown.town_id) {
