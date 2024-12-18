@@ -192,7 +192,10 @@
 
 
     Proscris.loadJobs = function() {
-        if(!Proscris.jobsLoaded) {
+    // Open the map first
+    GameMap.open();
+
+    if(!Proscris.jobsLoaded) {
         new UserMessage("Loading...", UserMessage.TYPE_HINT).show();
         var tiles = [];
         var index = 0;
@@ -209,73 +212,61 @@
                 }
             }
 
-            /*for(var fortNumber in r.forts) {
-                for(var fortNumber2 in r.forts[fortNumber]) {
-                    var fort = r.forts[fortNumber][fortNumber2];
-                    if(fort['fort']['alliance_id'] == Character.homeTown.alliance_id) {
-                       Proscris.forts.push(fort['fort']);
+            var allowedJobIds = [
+              170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184,
+              185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199,
+              200, 201, 202, 203, 204, 205, 130, 131, 132, 133, 134, 135, 136, 137, 138,
+              139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153,
+              154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168,
+              169
+            ];
+
+            for (var jobGroup in r.job_groups) {
+                var group = r.job_groups[jobGroup];
+                var jobsGroup = JobList.getJobsByGroupId(parseInt(jobGroup));
+                for (var tilecoord = 0; tilecoord < group.length; tilecoord++) {
+                    var xCoord = Math.floor(group[tilecoord][0] / GameMap.tileSize);
+                    var yCoord = Math.floor(group[tilecoord][1] / GameMap.tileSize);
+
+                    if (currentLength == 0) {
+                        tiles[index] = [];
+                    }
+                    tiles[index].push([xCoord, yCoord]);
+                    currentLength++;
+
+                    if (currentLength == maxLength) {
+                        currentLength = 0;
+                        index++;
+                    }
+
+                    // Filter jobs by ID
+                    for (var i = 0; i < jobsGroup.length; i++) {
+                        if (allowedJobIds.includes(jobsGroup[i].id)) { // Check if ID is allowed
+                            jobs.push(new JobPrototype(group[tilecoord][0], group[tilecoord][1], jobsGroup[i].id));
+                        }
                     }
                 }
-            }*/
-
-
-   var allowedJobIds = [
-  170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184,
-  185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199,
-  200, 201, 202, 203, 204, 205, 130, 131, 132, 133, 134, 135, 136, 137, 138,
-  139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153,
-  154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168,
-  169
-];
-
-
-
-for (var jobGroup in r.job_groups) {
-    var group = r.job_groups[jobGroup];
-    var jobsGroup = JobList.getJobsByGroupId(parseInt(jobGroup));
-    for (var tilecoord = 0; tilecoord < group.length; tilecoord++) {
-        var xCoord = Math.floor(group[tilecoord][0] / GameMap.tileSize);
-        var yCoord = Math.floor(group[tilecoord][1] / GameMap.tileSize);
-
-        if (currentLength == 0) {
-            tiles[index] = [];
-        }
-        tiles[index].push([xCoord, yCoord]);
-        currentLength++;
-
-        if (currentLength == maxLength) {
-            currentLength = 0;
-            index++;
-        }
-
-        // Filtrarea joburilor după ID
-        for (var i = 0; i < jobsGroup.length; i++) {
-            if (allowedJobIds.includes(jobsGroup[i].id)) { // Verifică dacă ID-ul este permis
-                jobs.push(new JobPrototype(group[tilecoord][0], group[tilecoord][1], jobsGroup[i].id));
             }
-        }
-    }
-}
 
             var toLoad = tiles.length;
             var loaded = 0;
-                for(var blocks = 0; blocks < tiles.length;blocks++) {
-                    GameMap.Data.Loader.load(tiles[blocks],function(){
-                        loaded++;
-                        if(loaded == toLoad) {
-                            Proscris.jobsLoaded = true;
-                            Proscris.allJobs = jobs;
-                            Proscris.findAllConsumables();
-                            Proscris.createWindow();
-                        }
-                    });
-                }
+            for(var blocks = 0; blocks < tiles.length;blocks++) {
+                GameMap.Data.Loader.load(tiles[blocks],function(){
+                    loaded++;
+                    if(loaded == toLoad) {
+                        Proscris.jobsLoaded = true;
+                        Proscris.allJobs = jobs;
+                        Proscris.findAllConsumables();
+                        Proscris.createWindow();
+                    }
+                });
+            }
         });
-      }else {
-          Proscris.findAllConsumables();
-          Proscris.createWindow();
-      }
-    };
+    } else {
+        Proscris.findAllConsumables();
+        Proscris.createWindow();
+    }
+};
     Proscris.loadJobData = function(callback) {
         Ajax.get('work','index',{},function(r) {
             if(r.error) {
@@ -285,7 +276,6 @@ for (var jobGroup in r.job_groups) {
             JobsModel.initJobs(r.jobs);
             callback();
         });
-    };
     Proscris.loadSets = function(callback) {
         Ajax.remoteCallMode('inventory', 'show_equip', {}, function(r) {
             Proscris.sets = r.data;
