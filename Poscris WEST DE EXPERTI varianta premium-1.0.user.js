@@ -175,7 +175,6 @@
 
     };
 
-
     Proscris.isNumber = function(potentialNumber) {
         return Number.isInteger(parseInt(potentialNumber));
     };
@@ -188,8 +187,6 @@
         console.log("Generated job set delay is :" + number + " seconds");
         return number;
     }
-
-
 
     Proscris.loadJobs = function() {
         if(!Proscris.jobsLoaded) {
