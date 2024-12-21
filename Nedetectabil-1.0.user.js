@@ -1575,96 +1575,63 @@ SNICKERS.loadJobs = function() {
     }
 
    SNICKERS.createSettingsGui = function() {
-		var htmlSkel = $("<div id='settings_overview' style='padding:10px;'></div>");
-		var checkboxAddEnergy = new west.gui.Checkbox();
-		checkboxAddEnergy.setLabel("Add energy");
-		checkboxAddEnergy.setSelected(SNICKERS.settings.addEnergy);
-		checkboxAddEnergy.setCallback(function() {
-			SNICKERS.settings.addEnergy = !SNICKERS.settings.addEnergy;
-		});
-		var checkboxAddMotivation = new west.gui.Checkbox();
-		checkboxAddMotivation.setLabel("Add motivation");
-		checkboxAddMotivation.setSelected(SNICKERS.settings.addMotivation);
-		checkboxAddMotivation.setCallback(function() {
-			SNICKERS.settings.addMotivation = !SNICKERS.settings.addMotivation;
-		});
-		var checkboxAddHealth = new west.gui.Checkbox();
-		checkboxAddHealth.setLabel("Add health");
-		checkboxAddHealth.setSelected(SNICKERS.settings.addHealth);
-		checkboxAddHealth.setCallback(function() {
-			SNICKERS.settings.addHealth = !SNICKERS.settings.addHealth;
-		});
-		var checkboxUseBestGear = new west.gui.Checkbox(); // New checkbox for bestgear setting
-		checkboxUseBestGear.setLabel("Use best gear");
-		checkboxUseBestGear.setSelected(SNICKERS.settings.useBestGear);
-		checkboxUseBestGear.setCallback(function() {
-			SNICKERS.settings.useBestGear = !SNICKERS.settings.useBestGear;
-		});
-
-		var htmlHealthStop = $("<div></div>");
-		htmlHealthStop.append("<span> Stoppage health percent value </span>");
-		var healthStopTextfiled = new west.gui.Textfield("healthStop");
-		healthStopTextfiled.setValue(SNICKERS.settings.healthStop);
-		healthStopTextfiled.setWidth(100);
-		htmlHealthStop.append(healthStopTextfiled.getMainDiv());
-		var htmlSetWearDelay = $("<div></div>");
-		htmlSetWearDelay.append("<span> Job set equip delay </span>");
-		var setWearDelayTextfiled = new west.gui.Textfield("setWearDelay");
-		setWearDelayTextfiled.setValue(SNICKERS.settings.setWearDelay);
-		setWearDelayTextfiled.setWidth(100);
-		htmlSetWearDelay.append(setWearDelayTextfiled.getMainDiv());
-
-		var htmlJobDelay = $("<div></div>");
-		htmlJobDelay.append("<span> Random delay between jobs(seconds)</span>");
-		var jobDelayTextFieldMin = new west.gui.Textfield("jobDelay");
-		jobDelayTextFieldMin.setValue(SNICKERS.settings.jobDelayMin);
-		jobDelayTextFieldMin.setWidth(50);
-		var jobDelayTextFieldMax = new west.gui.Textfield("jobDelay");
-		jobDelayTextFieldMax.setValue(SNICKERS.settings.jobDelayMax);
-		jobDelayTextFieldMax.setWidth(50);
-
-		htmlJobDelay.append(jobDelayTextFieldMin.getMainDiv());
-		htmlJobDelay.append("<span> - </span>");
-		htmlJobDelay.append(jobDelayTextFieldMax.getMainDiv());
-
-		var htmlRegeneration = $("<div></div>");
-		var checkboxEnableRegeneration = new west.gui.Checkbox();
-		checkboxEnableRegeneration.setLabel("Enable regeneration");
-		checkboxEnableRegeneration.setSelected(SNICKERS.settings.enableRegeneration);
-		checkboxEnableRegeneration.setCallback(function() {
-			SNICKERS.settings.enableRegeneration = !SNICKERS.settings.enableRegeneration;
-			if (SNICKERS.settings.enableRegeneration) {
-				$("#regeneration_choices_container").css('visibility', 'visible');
-			} else {
-				$("#regeneration_choices_container").css('visibility', 'hidden');
-			}
-		});
-
-    var sleepPlacesCombobox = new west.gui.Combobox("sleep_places");
-    SNICKERS.addSleepPlacesItems(sleepPlacesCombobox);
-    sleepPlacesCombobox = sleepPlacesCombobox.select(SNICKERS.selectedSleepPlace);
-    sleepPlacesCombobox.addListener(function(value) {
-        SNICKERS.selectedSleepPlace = value;
-        SNICKERS.selectTab("settings");
+    var htmlSkel = $("<div id='settings_overview' style='padding:10px;'></div>");
+    var checkboxAddEnergy = new west.gui.Checkbox();
+    checkboxAddEnergy.setLabel("Add energy");
+    checkboxAddEnergy.setSelected(SNICKERS.settings.addEnergy);
+    checkboxAddEnergy.setCallback(function() {
+        SNICKERS.settings.addEnergy = !SNICKERS.settings.addEnergy;
+    });
+    var checkboxAddMotivation = new west.gui.Checkbox();
+    checkboxAddMotivation.setLabel("Add motivation");
+    checkboxAddMotivation.setSelected(SNICKERS.settings.addMotivation);
+    checkboxAddMotivation.setCallback(function() {
+        SNICKERS.settings.addMotivation = !SNICKERS.settings.addMotivation;
+    });
+    var checkboxAddHealth = new west.gui.Checkbox();
+    checkboxAddHealth.setLabel("Add health");
+    checkboxAddHealth.setSelected(SNICKERS.settings.addHealth);
+    checkboxAddHealth.setCallback(function() {
+        SNICKERS.settings.addHealth = !SNICKERS.settings.addHealth;
+    });
+    var checkboxUseBestGear = new west.gui.Checkbox();
+    checkboxUseBestGear.setLabel("Use best gear");
+    checkboxUseBestGear.setSelected(SNICKERS.settings.useBestGear);
+    checkboxUseBestGear.setCallback(function() {
+        SNICKERS.settings.useBestGear = !SNICKERS.settings.useBestGear;
     });
 
-    var htmlRegenerationChoices = $("<div id='regeneration_choices_container'></div>");
-    htmlRegenerationChoices.css({
-        'display': 'inline-block',
-        'padding-left': '10px',
-        'visibility': (SNICKERS.settings.enableRegeneration) ? 'visible' : "hidden"
-    });
-    htmlRegenerationChoices.append($("<span>Sleep place: </span>"));
-    htmlRegenerationChoices.append(sleepPlacesCombobox.getMainDiv());
+    var htmlHealthStop = $("<div></div>");
+    htmlHealthStop.append("<span> Stoppage health percent value </span>");
+    var healthStopTextfiled = new west.gui.Textfield("healthStop");
+    healthStopTextfiled.setValue(SNICKERS.settings.healthStop);
+    healthStopTextfiled.setWidth(100);
+    htmlHealthStop.append(healthStopTextfiled.getMainDiv());
+    var htmlSetWearDelay = $("<div></div>");
+    htmlSetWearDelay.append("<span> Job set equip delay </span>");
+    var setWearDelayTextfiled = new west.gui.Textfield("setWearDelay");
+    setWearDelayTextfiled.setValue(SNICKERS.settings.setWearDelay);
+    setWearDelayTextfiled.setWidth(100);
+    htmlSetWearDelay.append(setWearDelayTextfiled.getMainDiv());
 
-    htmlRegeneration.append(checkboxEnableRegeneration.getMainDiv());
-    htmlRegeneration.append(htmlRegenerationChoices);
+    var htmlJobDelay = $("<div></div>");
+    htmlJobDelay.append("<span> Random delay between jobs(seconds)</span>");
+    var jobDelayTextFieldMin = new west.gui.Textfield("jobDelay");
+    jobDelayTextFieldMin.setValue(SNICKERS.settings.jobDelayMin);
+    jobDelayTextFieldMin.setWidth(50);
+    var jobDelayTextFieldMax = new west.gui.Textfield("jobDelay");
+    jobDelayTextFieldMax.setValue(SNICKERS.settings.jobDelayMax);
+    jobDelayTextFieldMax.setWidth(50);
+
+    htmlJobDelay.append(jobDelayTextFieldMin.getMainDiv());
+    htmlJobDelay.append("<span> - </span>");
+    htmlJobDelay.append(jobDelayTextFieldMax.getMainDiv());
 
     var buttonApply = new west.gui.Button("Apply", function() {
         SNICKERS.settings.addEnergy = checkboxAddEnergy.isSelected();
         SNICKERS.settings.addMotivation = checkboxAddMotivation.isSelected();
         SNICKERS.settings.addHealth = checkboxAddHealth.isSelected();
-        SNICKERS.settings.useBestGear = checkboxUseBestGear.isSelected(); // Apply new setting
+        SNICKERS.settings.useBestGear = checkboxUseBestGear.isSelected();
         if (SNICKERS.isNumber(healthStopTextfiled.getValue())) {
             var healthStop = parseInt(healthStopTextfiled.getValue());
             healthStop = Math.min(30, healthStop);
@@ -1692,27 +1659,25 @@ SNICKERS.loadJobs = function() {
             new UserMessage("Wrong format of delay job max value. Please set a number.", UserMessage.TYPE_ERROR).show();
         }
         SNICKERS.selectTab("settings");
-    })
+    });
 
-		htmlSkel.append(checkboxAddEnergy.getMainDiv());
-		htmlSkel.append("<br>");
-		htmlSkel.append(checkboxAddMotivation.getMainDiv());
-		htmlSkel.append("<br>");
-		htmlSkel.append(checkboxAddHealth.getMainDiv());
-		htmlSkel.append("<br>");
-		htmlSkel.append(checkboxUseBestGear.getMainDiv()); // Add new checkbox to the GUI
-		htmlSkel.append("<br>");
-		htmlSkel.append(htmlHealthStop);
-		htmlSkel.append("<br>");
-		htmlSkel.append(htmlSetWearDelay);
-		htmlSkel.append("<br>");
-		htmlSkel.append(htmlJobDelay);
-		htmlSkel.append("<br>");
-		htmlSkel.append(htmlRegeneration);
-		htmlSkel.append("<br>");
-		htmlSkel.append(buttonApply.getMainDiv());
-		return htmlSkel;
-	};
+    htmlSkel.append(checkboxAddEnergy.getMainDiv());
+    htmlSkel.append("<br>");
+    htmlSkel.append(checkboxAddMotivation.getMainDiv());
+    htmlSkel.append("<br>");
+    htmlSkel.append(checkboxAddHealth.getMainDiv());
+    htmlSkel.append("<br>");
+    htmlSkel.append(checkboxUseBestGear.getMainDiv());
+    htmlSkel.append("<br>");
+    htmlSkel.append(htmlHealthStop);
+    htmlSkel.append("<br>");
+    htmlSkel.append(htmlSetWearDelay);
+    htmlSkel.append("<br>");
+    htmlSkel.append(htmlJobDelay);
+    htmlSkel.append("<br>");
+    htmlSkel.append(buttonApply.getMainDiv());
+    return htmlSkel;
+};
     SNICKERS.createStatisticsGui = function() {
         var htmlSkel = $("<div id=\'statistics_overview'\></div>");
         htmlSkel.append($("<span>Job count in this session: " + SNICKERS.statistics.jobsInSession + "</span><br>"));
