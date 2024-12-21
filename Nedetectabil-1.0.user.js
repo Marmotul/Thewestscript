@@ -1035,36 +1035,45 @@ SNICKERS.loadJobs = function() {
         SNICKERS.run();
     };
     SNICKERS.runJob = async function(jobIndex, jobCount) {
-		SNICKERS.statistics.jobsInSession += jobCount;
-		SNICKERS.statistics.totalJobs += jobCount;
-		var oldXp = Character.experience;
-		if (SNICKERS.settings.useBestGear) { // Check if useBestGear setting is enabled
-			await SNICKERS.equipBestGear(SNICKERS.addedJobs[jobIndex].id);
-		} else {
-			await SNICKERS.equipSet(SNICKERS.addedJobs[jobIndex].set);
-		}
-		for (var i = 0; i < jobCount; i++) {
-			JobWindow.startJob(SNICKERS.addedJobs[jobIndex].id, SNICKERS.addedJobs[jobIndex].x, SNICKERS.addedJobs[jobIndex].y, 15);
-		}
-		await new Promise(r => setTimeout(r, SNICKERS.settings.setWearDelay * 1000));
-		while (true) {
-			if (TaskQueue.queue.length == 0) {
-				SNICKERS.updateStatistics(oldXp);
-				SNICKERS.setCookies();
-				SNICKERS.prepareJobRun(jobIndex);
-				return;
-			}
-			if (!SNICKERS.isRunning || SNICKERS.isHealthBelowLimit()) {
-				break;
-			}
-			await new Promise(r => setTimeout(r, 1));
-		}
-		SNICKERS.statistics.jobsInSession -= TaskQueue.queue.length;
-		SNICKERS.statistics.totalJobs -= TaskQueue.queue.length;
-		SNICKERS.updateStatistics(oldXp);
-		SNICKERS.setCookies();
-		SNICKERS.cancelJobs();
-	};
+        SNICKERS.statistics.jobsInSession += jobCount;
+        SNICKERS.statistics.totalJobs += jobCount;
+        var oldXp = Character.experience;
+
+        // Equip the best gear initially
+        if (SNICKERS.settings.useBestGear) {
+            await SNICKERS.equipBestGear(SNICKERS.addedJobs[jobIndex].id);
+        } else {
+            await SNICKERS.equipSet(SNICKERS.addedJobs[jobIndex].set);
+        }
+
+        for (var i = 0; i < jobCount; i++) {
+            JobWindow.startJob(SNICKERS.addedJobs[jobIndex].id, SNICKERS.addedJobs[jobIndex].x, SNICKERS.addedJobs[jobIndex].y, 15);
+        }
+
+        // Wait for the delay after equipping the best gear
+        await new Promise(r => setTimeout(r, SNICKERS.settings.setWearDelay * 1000));
+
+        // Switch to the desired gear from the job set option
+        await SNICKERS.equipSet(SNICKERS.addedJobs[jobIndex].set);
+
+        while (true) {
+            if (TaskQueue.queue.length == 0) {
+                SNICKERS.updateStatistics(oldXp);
+                SNICKERS.setCookies();
+                SNICKERS.prepareJobRun(jobIndex);
+                return;
+            }
+            if (!SNICKERS.isRunning || SNICKERS.isHealthBelowLimit()) {
+                break;
+            }
+            await new Promise(r => setTimeout(r, 1));
+    }
+    SNICKERS.statistics.jobsInSession -= TaskQueue.queue.length;
+    SNICKERS.statistics.totalJobs -= TaskQueue.queue.length;
+    SNICKERS.updateStatistics(oldXp);
+    SNICKERS.setCookies();
+    SNICKERS.cancelJobs();
+};
     SNICKERS.cancelJobs = function() {
         if(TaskQueue.queue.length > 0)
             TaskQueue.cancelAll();
