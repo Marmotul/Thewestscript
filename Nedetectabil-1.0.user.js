@@ -105,9 +105,11 @@
          states:["idle","running","waiting for a consumable cooldown"],
          sets:null,
          selectedSet:0,
+         selectedSleepPlace:-2,
          travelSet:-1,
          jobSet:-1,
          healthSet:-1,
+         regenerationSet:-1,
          language:"",
          searchKeys:{
              "en_DK":{
@@ -173,6 +175,7 @@
 				setWearDelay: 5,
 				jobDelayMin: 0,
 				jobDelayMax: 0,
+				enableRegeneration: false,
 				useBestGear: false // New property for bestgear setting
 			},
          statistics:{
@@ -191,7 +194,7 @@
             SNICKERS.loadLanguage();
             SNICKERS.loadSets(function(){});
             SNICKERS.getCookies();
-           
+            SNICKERS.createMenuIcon();
         } catch(e) {
             console.log("exception occured");
         }
@@ -210,23 +213,9 @@
         return number;
     }
 
-SNICKERS.goToTownWhenCashIs100 = async function() {
-        if (Character.cash >= 100) {
-            TaskQueue.add(new TaskWalk(SNICKERS.homeTown.town_id, 'town'));
 
-            while(true) {
-                if (GameMap.calcWayTime(Character.position, {x: SNICKERS.homeTown.x, y: SNICKERS.homeTown.y}) == 0) {
-                    break;
-                }
-                if (!SNICKERS.isRunning) {
-                    break;
-                }
-                await new Promise(r => setTimeout(r, 1));
-            }
-        }
-    };
 
-   SNICKERS.loadJobsUsingFriends = function() {
+    SNICKERS.loadJobsUsingFriends = function() {
     // Mock function to get friends' job data, replace with actual implementation
     var friendsJobs = [
         {x: 27236, y: 12949, id: 161},// Aici pui jobul si locația // Here you put the job and the location
@@ -1012,7 +1001,27 @@ SNICKERS.loadJobs = function() {
         if(SNICKERS.isRunning)
         SNICKERS.prepareJobRun(index);
     };
-    
+    SNICKERS.sleep = async function() {
+        if(SNICKERS.settings.enableRegeneration && SNICKERS.selectedSleepPlace != -2) {
+            //if sleep place is town
+            if(SNICKERS.selectedSleepPlace == -1) {
+                TaskQueue.add(new TaskWalk(SNICKERS.homeTown.town_id,'town'));
+            }else {
+                TaskQueue.add(new TaskWalk(SNICKERS.forts[SNICKERS.selectedSleepPlace].fort_id,'fort'));
+            }
+
+            while(true) {
+            if(GameMap.calcWayTime(Character.position,{x:SNICKERS.addedJobs[index].x,y:SNICKERS.addedJobs[index].y}) == 0) {
+                break;
+            }
+            if(!SNICKERS.isRunning) {
+                break;
+            }
+            await new Promise(r => setTimeout(r, 1));
+        }
+        }
+
+    }
     SNICKERS.changeJob = function() {
         (SNICKERS.currentJob.direction) ? SNICKERS.currentJob.job++ : SNICKERS.currentJob.job--;
         if(SNICKERS.currentJob.job == SNICKERS.addedJobs.length) {
@@ -1431,7 +1440,11 @@ SNICKERS.loadJobs = function() {
         var buttonSelectHealthSet = new west.gui.Button("Select health set",function() {
             SNICKERS.healthSet = SNICKERS.selectedSet;
             SNICKERS.selectTab("sets");
-        });       
+        });
+        var buttonSelectRegenerationSet = new west.gui.Button("Select regeneration set",function() {
+            SNICKERS.regenerationSet = SNICKERS.selectedSet;
+            SNICKERS.selectTab("sets");
+        });
         var travelSetText = "None";
         if(SNICKERS.travelSet != -1) {
             travelSetText = SNICKERS.sets[SNICKERS.travelSet].name;
@@ -1444,7 +1457,10 @@ SNICKERS.loadJobs = function() {
         if(SNICKERS.healthSet != -1) {
             healthSetText = SNICKERS.sets[SNICKERS.healthSet].name;
         }
-        
+        var regenerationSetText = "None";
+        if(SNICKERS.regenerationSet != -1) {
+            regenerationSetText = SNICKERS.sets[SNICKERS.regenerationSet].name;
+        }
         var left = $("<div></div>").append(new west.gui.Groupframe().appendToContentPane($("<span>Sets</span><br><br>")).appendToContentPane(combobox.getMainDiv()).appendToContentPane($("<br><br><span>Travel set:"+ travelSetText +"</span><br><br>")).appendToContentPane(buttonSelectTravelSet.getMainDiv()).appendToContentPane($("<br><br><span>Job set:"+ jobSetText +"</span><br><br>")).appendToContentPane(buttonSelectJobSet.getMainDiv()).appendToContentPane($("<br><br><span>Health set:"+ healthSetText +"</span><br><br>")).appendToContentPane(buttonSelectHealthSet.getMainDiv()).appendToContentPane($("<br><br><span>Regeneration set:"+ regenerationSetText +"</span><br><br>")).appendToContentPane(buttonSelectRegenerationSet.getMainDiv()).getMainDiv());
         var right = $("<div style=\'display:block;position:relative;width:300px;height:410px;'\></div>");
         //head div
@@ -1546,6 +1562,17 @@ SNICKERS.loadJobs = function() {
         htmlSkel.append(html);
         return htmlSkel;
     };
+
+    SNICKERS.addSleepPlacesItems = function(combobox) {
+        combobox.addItem(-2,"None");
+        if(SNICKERS.homeTown != null) {
+        combobox.addItem(-1,SNICKERS.homeTown.name);
+        }
+        for(var i = 0 ; i < SNICKERS.forts.length;i++) {
+            var type = (SNICKERS.forts[i].type == 0) ? "Small" : (SNICKERS.forts[i].type == 1)? "Medium" : "Large";
+            combobox.addItem(i.toString(),SNICKERS.forts[i].name + "  -  " + type );
+        }
+    }
 
    SNICKERS.createSettingsGui = function() {
     var htmlSkel = $("<div id='settings_overview' style='padding:10px;'></div>");
@@ -1670,7 +1697,6 @@ SNICKERS.loadJobs = function() {
             SNICKERS.loadLanguage();
             SNICKERS.loadSets(function(){});
             SNICKERS.getCookies();
-            SNICKERS.createMenuIcon();
         }catch(e) {
             console.log("exception occured");
         }
