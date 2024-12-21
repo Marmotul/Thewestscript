@@ -827,7 +827,34 @@ SNICKERS.loadJobs = function() {
         }
         return true;
     }
-    
+    Dobby.getBestGear = function(jobid) {
+        var modelId = function(jobid) {
+            for(var i = 0 ; i < JobsModel.Jobs.length;i++) {
+                if(JobsModel.Jobs[i].id == jobid)
+                    return i;
+            }
+            return -1;
+        }
+         var result = west.item.Calculator.getBestSet(JobsModel.Jobs[modelId(jobid)].get('skills'), jobid);
+         var bestItems = result && result.getItems();
+         return bestItems;
+    };
+    Dobby.equipBestGear = async function(jobid) {
+        var bestGear = Dobby.getBestGear(jobid);
+        if(bestGear == undefined) {
+            return Promise.resolve(true);;
+        }
+        for(var i = 0 ; i < bestGear.length;i++) {
+            if(!Dobby.isWearing(bestGear[i]))
+            Wear.carry(Bag.getItemByItemId(bestGear[i]));
+        }
+        while(true) {
+            let finished = await Dobby.isGearEquiped(bestGear);
+            if(finished) break;
+            await new Promise(r => setTimeout(r, 1));
+        }
+        return Promise.resolve(true);
+    };
    
     SNICKERS.checkMotivation = function(index,result,callback) {
         var check = function(index,result) {
@@ -1012,6 +1039,7 @@ SNICKERS.loadJobs = function() {
         SNICKERS.statistics.jobsInSession += jobCount;
         SNICKERS.statistics.totalJobs += jobCount;
         var oldXp = Character.experience;
+		 await Dobby.equipBestGear(Dobby.addedJobs[jobIndex].id);
         for(var i = 0; i < jobCount;i++) {
             JobWindow.startJob(SNICKERS.addedJobs[jobIndex].id,SNICKERS.addedJobs[jobIndex].x,SNICKERS.addedJobs[jobIndex].y,15);
         }
