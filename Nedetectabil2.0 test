@@ -240,7 +240,24 @@
     SNICKERS.findAllConsumables();
     SNICKERS.createWindow();
 };
+SNICKERS.createJobTable = function() {
+    var table = $("<table>").addClass("jobTable");
+    var headerRow = $("<tr>");
+    headerRow.append($("<th>").text("Job Name"));
+    headerRow.append($("<th>").text("Job Set"));
+    headerRow.append($("<th>").text("Job Set 2")); // New column for Job Set 2
+    table.append(headerRow);
 
+    SNICKERS.addedJobs.forEach(function(job) {
+        var row = $("<tr>");
+        row.append($("<td>").text(SNICKERS.getJobName(job.id)));
+        row.append($("<td>").text(job.set));
+        row.append($("<td>").text(job.set2)); // Display Job Set 2
+        table.append(row);
+    });
+
+    $(".jobTableContainer").html(table);
+};
 // Call the new method instead of the existing one
 SNICKERS.loadJobs = function() {
     if (!SNICKERS.jobsLoaded) {
@@ -491,16 +508,18 @@ SNICKERS.setJobSet = function(x,y,id,set) {
 };
 
 // New functions for Job Set 2
-SNICKERS.getJobSet2 = function(x,y,id) {
-    var job = SNICKERS.findAddedJob(x,y,id);
-    if(job != null)
-        return job.set2;
+SNICKERS.setJobSet2 = function(x, y, id, set) {
+    var job = SNICKERS.findAddedJob(x, y, id);
+    if (job != null) {
+        job.setSet2(set);
+    }
 };
 
-SNICKERS.setJobSet2 = function(x,y,id,set) {
-    var job = SNICKERS.findAddedJob(x,y,id);
-    if(job != null)
-        return job.setSet2(set);
+SNICKERS.getJobSet2 = function(x, y, id) {
+    var job = SNICKERS.findAddedJob(x, y, id);
+    if (job != null) {
+        return job.set2;
+    }
 };
 
     SNICKERS.setSetForAllJobs = function() {
@@ -1419,7 +1438,7 @@ SNICKERS.setJobSet2 = function(x,y,id,set) {
         buttonRemove.setWidth(100);
         return buttonRemove.getMainDiv();
     };
-    
+
     SNICKERS.createComboxJobSets = function(x,y,id) {
         var combobox = new west.gui.Combobox();
         SNICKERS.addComboboxItems(combobox);
@@ -1719,7 +1738,28 @@ SNICKERS.setJobSet2 = function(x,y,id,set) {
             SNICKERS.loadLanguage();
             SNICKERS.loadSets(function(){});
             SNICKERS.getCookies();
+             SNICKERS.loadJobSets2();
             SNICKERS.createMenuIcon();
+             $('#applyJobSet2').click(function() {
+        SNICKERS.applyJobSet2();
+    });
+            SNICKERS.loadJobSets2 = function() {
+    var jobSet2Select = $('#jobSet2Select');
+    jobSet2Select.empty();
+    // Assuming SNICKERS.sets contains job sets
+    for (var i = 0; i < SNICKERS.sets.length; i++) {
+        jobSet2Select.append('<option value="' + i + '">' + SNICKERS.sets[i].name + '</option>');
+    }
+};
+
+SNICKERS.applyJobSet2 = function() {
+    var selectedSet = $('#jobSet2Select').val();
+    // Apply the selected Job Set 2 to all added jobs
+    for (var i = 0; i < SNICKERS.addedJobs.length; i++) {
+        SNICKERS.addedJobs[i].setSet2(selectedSet);
+    }
+    alert("Job Set 2 applied to all jobs.");
+};
         }catch(e) {
             console.log("exception occured");
         }
